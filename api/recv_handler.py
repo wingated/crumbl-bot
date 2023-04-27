@@ -19,7 +19,9 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
 
         if self.rfile:
-            response = self.rfile.read( int(self.headers['Content-Length']) )
+            content_length = int(self.headers['Content-Length'])
+            response = f"Got post data: {content_length}\n"
+            response += self.rfile.read( content_length )
         else:
             response = "(no data posted)"
              # print urlparse.parse_qs(self.rfile.read(int(self.headers['Content-Length'])))
