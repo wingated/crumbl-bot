@@ -1,7 +1,7 @@
 import os
 from twilio.rest import Client
 
-from http.server import BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 class handler(BaseHTTPRequestHandler):
 
@@ -14,19 +14,33 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
 
-        self.send_response(200)
-        self.send_header('Content-type', 'text/plain')
-
-        if self.rfile:
-            content_length = int(self.headers['Content-Length'])
+        if self.rfile and self.headers['Content-Length']:
+            content_length = int( self.headers['Content-Length'] )
             response = f"Got post data: {content_length}\n"
-            response += self.rfile.read( content_length )
+            post_data = self.rfile.read( content_length )
+            response += post_data.decode('utf-8')
         else:
             response = "(no data posted)"
              # print urlparse.parse_qs(self.rfile.read(int(self.headers['Content-Length'])))
 #             for key,value in dict(urlparse.parse_qs(self.rfile.read(int(self.headers['Content-Length'])))).items():
 #                 response += key + " = " + value[0]
 
-        self.wfile.write( response.encode() )
+        response = response.encode()
+
+        print( "HEY", response )
+
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.send_header("Content-Length", str(len(response)))
+        self.end_headers()
+        self.wfile.write( response )
+
+        print( "DONE" )
 
         return
+
+if __name__ == "__main__":
+    try:
+        HTTPServer(("0.0.0.0", 9000), handler).serve_forever()
+    except KeyboardInterrupt:
+        print('shutting down server')
