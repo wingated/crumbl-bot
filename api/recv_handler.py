@@ -1,5 +1,4 @@
 import os
-import urlparse
 from twilio.rest import Client
 
 from http.server import BaseHTTPRequestHandler
@@ -19,11 +18,13 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
 
-        response = ""
         if self.rfile:
+            response = self.rfile.read( int(self.headers['Content-Length']) )
+        else:
+            response = "(no data posted)"
              # print urlparse.parse_qs(self.rfile.read(int(self.headers['Content-Length'])))
-             for key,value in dict(urlparse.parse_qs(self.rfile.read(int(self.headers['Content-Length'])))).items():
-                 response += key + " = " + value[0]
+#             for key,value in dict(urlparse.parse_qs(self.rfile.read(int(self.headers['Content-Length'])))).items():
+#                 response += key + " = " + value[0]
 
         self.wfile.write( response.encode() )
 
