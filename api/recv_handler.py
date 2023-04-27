@@ -1,43 +1,74 @@
 import os
 from twilio.rest import Client
+import openai
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import urlparse, parse_qs
+
+#
+# ==========================================================================
+#
 
 class handler(BaseHTTPRequestHandler):
 
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/plain')
+    def final_response( self, response ):
+        self.send_response( 200 )
+        self.send_header( 'Content-type', 'text/plain' )
+        self.send_header( "Content-Length", str(len(response)) )
         self.end_headers()
-        self.wfile.write( "Method not supported".encode() )
+        self.wfile.write( response )
+
+    def do_GET(self):
+        self.final_response( "Method not supported".encode() )
         return
+
+    def parse_post( self ):
+        content_length = int( self.headers['Content-Length'] )
+        post_data = self.rfile.read( content_length )
+
+        if type(post_data) == bytes:
+            post_data = post_data.decode('utf-8')
+
+        form = dict( parse_qs(post_data) )
+
+        return form
 
     def do_POST(self):
 
-        if self.rfile and self.headers['Content-Length']:
-            content_length = int( self.headers['Content-Length'] )
-            response = f"Got post data: {content_length}\n"
-            post_data = self.rfile.read( content_length )
-            response += post_data.decode('utf-8')
-        else:
-            response = "(no data posted)"
-             # print urlparse.parse_qs(self.rfile.read(int(self.headers['Content-Length'])))
-#             for key,value in dict(urlparse.parse_qs(self.rfile.read(int(self.headers['Content-Length'])))).items():
-#                 response += key + " = " + value[0]
+        if not ( self.rfile and self.headers['Content-Length'] ):
+            self.final_response( "(no data posted)".encode() )
+            return
+
+        form = self.parse_post()
+        msg = form['Body'][0]
+        user = form['From'][0]
+
+        response = convo_turn( user, msg )
 
         response = response.encode()
 
         print( "HEY", response )
 
-        self.send_response(200)
-        self.send_header('Content-type', 'text/plain')
-        self.send_header("Content-Length", str(len(response)))
-        self.end_headers()
-        self.wfile.write( response )
-
-        print( "DONE" )
-
+        self.final_response( response )
         return
+
+#
+# ==========================================================================
+#
+
+def convo_turn( user, msg ):
+    # look up user, get conversation history
+    # tack on latest convo turn
+    # ping openai to get response
+    # return response
+
+    response = f"Hey {user}, thanks for saying '{msg}'"
+
+    return response
+
+#
+# ==========================================================================
+#
 
 if __name__ == "__main__":
     try:
