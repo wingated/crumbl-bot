@@ -42,7 +42,7 @@ Remember, since you are texting with a customer, you must NEVER say anything off
 Also remember, your responses must be short and concise.
 """
 
-HELP_MSG = """Type 'help' for help. Type 'reset' to reset our conversation."""
+HELP_MSG = """Type 'help me' for help. Type 'reset' to reset our conversation."""
 
 RESET_MSG = """Poof! I've forgotten our previous conversation."""
 
