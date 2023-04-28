@@ -89,7 +89,10 @@ class handler(BaseHTTPRequestHandler):
         msg = form['Body'][0]
         user = form['From'][0]
 
-        response = convo_turn( user, msg )
+        try:
+            response = convo_turn( user, msg )
+        except:
+            response = "Something went wrong! Please try again."
 
         print( f"{user}-{msg}-{response}" )
 
