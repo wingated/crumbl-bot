@@ -49,7 +49,7 @@ RESET_MSG = """Poof! I've forgotten our previous conversation."""
 INIT_MSG = """Hello, I am the crumbl-bot!
 I love to talk about cookies!
 Ask me anything!
-(or type 'help' for help)"""
+(or type 'help me' for help)"""
 
 #
 # ==========================================================================
@@ -91,6 +91,8 @@ class handler(BaseHTTPRequestHandler):
 
         response = convo_turn( user, msg )
 
+        print( f"{user}-{msg}-{response}" )
+
         response = response.encode()
 
         self.final_response( response )
@@ -124,7 +126,7 @@ def initialize_firebase():
         cred = credentials.Certificate( fb_admin_struct )
         frb_admin = firebase_admin.initialize_app( cred, {'databaseURL':os.environ['FIREBASE_URL']} )
     except Exception as e:
-        print( "EXCEPTION:", e )
+#        print( "EXCEPTION:", e )
         # XXX if we see an exception here, it's usually because the firebase
         # app has already been initialized. but there might be other
         # exceptions we need to handle better?
@@ -145,7 +147,7 @@ def get_init_convo():
 
 def check_for_special_message( user, msg ):
     msg = msg.lower().strip()
-    special_messages = [ 'help', 'reset' ]
+    special_messages = [ 'help me', 'reset' ]
     if msg in special_messages:
         return True
     return False
@@ -202,10 +204,10 @@ def convo_turn( user, msg ):
         ref.set( msgs )
 
     except Exception as e:
-        print( "EXCEPTION:", str(e) )
+#        print( "EXCEPTION:", str(e) )
         response = "Sorry, internal error."
 
-    print( "GOT RESPONSE:", response )
+#    print( "GOT RESPONSE:", response )
     return response
 
 #
