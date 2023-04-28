@@ -157,7 +157,7 @@ def check_for_special_message( user, msg ):
 
 def process_special_message( user, msg ):
     msg = msg.lower().strip()
-    if msg == 'help':
+    if msg == 'help me':
         return HELP_MSG
 
     if msg == 'reset':
@@ -169,6 +169,8 @@ def process_special_message( user, msg ):
         msgs = get_init_convo()
         ref.set( msgs )
         return RESET_MSG
+
+    return "Unknown special message!"
 
 def process_init_convo( user, msg ):
     msgs = get_init_convo()
