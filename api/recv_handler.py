@@ -51,6 +51,8 @@ I love to talk about cookies!
 Ask me anything - try asking about ganache, cookie jokes, the history of macarons, my favorite flavor or anything else you can think of!
 (or type 'help me' for help)"""
 
+ERROR_MSG = "Something went wrong! Please try again."
+
 #
 # ==========================================================================
 #
@@ -91,10 +93,15 @@ class handler(BaseHTTPRequestHandler):
 
         try:
             response = convo_turn( user, msg )
-        except:
-            response = "Something went wrong! Please try again."
+        except Exception as e:
+            print( "EXCEPTION:", str(e) )
+            response = ERROR_MSG
 
-        print( f"{user}-{msg}-{response}" )
+        if response is None:
+            print( "WEIRDNESS - response was 'None'" )
+            response = ERROR_MSG
+
+        print( f"{user}-{os.environ['OPENAI_MODEL']}-{msg}-{response}" )
 
         response = response.encode()
 
@@ -207,10 +214,9 @@ def convo_turn( user, msg ):
         ref.set( msgs )
 
     except Exception as e:
-#        print( "EXCEPTION:", str(e) )
-        response = "Sorry, internal error."
+        print( "EXCEPTION:", str(e) )
+        response = ERROR_MSG
 
-#    print( "GOT RESPONSE:", response )
     return response
 
 #
