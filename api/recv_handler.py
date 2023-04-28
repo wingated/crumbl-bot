@@ -119,25 +119,13 @@ def do_query( messages, max_tokens=512, temperature=1.0 ):
 
 def initialize_firebase():
 
-    fb_admin_struct = {
-        "type": "service_account",
-        "project_id": "crumbl-bot-data",
-        "private_key_id": "9cf49b13f2c6b09e42faf43c82cb6858389b4f63",
-        "private_key": os.environ['FIREBASE_PRIVATE_KEY'].encode('latin1').decode('unicode_escape'),  # for some reason, os.environ "helpfully" escapes "\n" sequences?!?!
-        "client_email": "firebase-adminsdk-5f8wd@crumbl-bot-data.iam.gserviceaccount.com",
-        "client_id": "113819215364669760652",
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-5f8wd%40crumbl-bot-data.iam.gserviceaccount.com"
-        }
-
     try:
+        fb_admin_struct = json.loads( os.environ['FIREBASE_AUTH'] )
         cred = credentials.Certificate( fb_admin_struct )
         frb_admin = firebase_admin.initialize_app( cred, {'databaseURL':os.environ['FIREBASE_URL']} )
     except Exception as e:
         print( "EXCEPTION:", e )
-        # XXX if we see an exception here, it's because the firebase
+        # XXX if we see an exception here, it's usually because the firebase
         # app has already been initialized. but there might be other
         # exceptions we need to handle better?
         pass
@@ -169,8 +157,12 @@ def process_special_message( user, msg ):
 
     if msg == 'reset':
         ref = get_user_cur_convo_ref( user )
-        # XXX save this somewhere?
+
+        prev_msgs = ref.get() # save somewhere?
+
         ref.delete()
+        msgs = get_init_convo()
+        ref.set( msgs )
         return RESET_MSG
 
 def process_init_convo( user, msg ):
