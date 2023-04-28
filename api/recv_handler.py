@@ -48,7 +48,7 @@ RESET_MSG = """Poof! I've forgotten our previous conversation."""
 
 INIT_MSG = """Hello, I am the crumbl-bot!
 I love to talk about cookies!
-Ask me anything!
+Ask me anything - try asking about ganache, cookie jokes, the history of macarons, my favorite flavor or anything else you can think of!
 (or type 'help me' for help)"""
 
 #
@@ -162,12 +162,10 @@ def process_special_message( user, msg ):
 
     if msg == 'reset':
         ref = get_user_cur_convo_ref( user )
-
         prev_msgs = ref.get() # save somewhere?
 
+        # this empties it out all the way.
         ref.delete()
-        msgs = get_init_convo()
-        ref.set( msgs )
         return RESET_MSG
 
     return "Unknown special message!"
